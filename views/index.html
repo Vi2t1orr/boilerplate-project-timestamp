@@ -1,16 +1,67 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Timestamp Microservice</title>
+</head>
 <body>
-  <input type="text" id="dateInput" placeholder="Data ou timestamp">
-  <button onclick="getTimestamp()">Converter</button>
-  <div id="result"></div>
+    <h1>Timestamp Microservice</h1>
 
-  <script>
-    async function getTimestamp() {
-      const response = await fetch(`/api/${document.getElementById('dateInput').value}`);
-      const data = await response.json();
-      document.getElementById('result').innerHTML = JSON.stringify(data);
-    }
-  </script>
+    <h2>Converter Data (UTC)</h2>
+    <input type="text" id="dateInput" placeholder="Data ou timestamp">
+    <button onclick="getTimestamp()">Converter</button>
+    <div id="result"></div>
+
+    <h2>Diferença entre Datas</h2>
+    <input type="text" id="date1" placeholder="Data 1">
+    <input type="text" id="date2" placeholder="Data 2">
+    <button onclick="getDateDiff()">Calcular Diferença</button>
+    <div id="diffResult"></div>
+
+    <script>
+        async function getTimestamp() {
+            const dateInputValue = document.getElementById('dateInput').value;
+            const resultElement = document.getElementById('result');
+
+            if (!resultElement) {
+                console.error("Elemento #result não encontrado!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/${dateInputValue}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error("Erro ao obter o timestamp:", error);
+                resultElement.textContent = `Erro: ${error.message}`;
+            }
+        }
+
+        async function getDateDiff() {
+            const date1 = document.getElementById('date1').value;
+            const date2 = document.getElementById('date2').value;
+            const diffResultElement = document.getElementById('diffResult');
+
+            if (!diffResultElement) {
+                console.error("Elemento #diffResult não encontrado!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/diff/${date1}/${date2}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                diffResultElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error("Erro ao calcular a diferença:", error);
+                diffResultElement.textContent = `Erro: ${error.message}`;
+            }
+        }
+    </script>
 </body>
 </html>
